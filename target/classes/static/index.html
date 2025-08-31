@@ -4,95 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spring Boot Redis 示例</title>
+    <!-- 引入Tailwind CSS框架用于样式设计 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100">
+    <!-- 页面容器 -->
     <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- 页面标题 -->
         <h1 class="text-3xl font-bold text-center mb-8 text-blue-600">
             <i class="fa fa-database mr-2"></i>Spring Boot Redis 示例
         </h1>
         
+        <!-- 用户操作区域 -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">用户操作</h2>
             
+            <!-- 保存用户到Redis -->
             <div class="mb-6">
                 <h3 class="text-lg font-medium mb-3 text-gray-600">保存用户到Redis</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-gray-700 mb-2">用户ID</label>
-                        <input type="number" id="userId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="userId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户ID">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">用户名</label>
-                        <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户名">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">年龄</label>
-                        <input type="number" id="age" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="age" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入年龄">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">邮箱</label>
-                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入邮箱">
                     </div>
                 </div>
-                <button onclick="saveUser()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
-                    <i class="fa fa-save mr-1"></i>保存用户
+                <button onclick="saveUser()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300">
+                    <i class="fas fa-save mr-1"></i>保存用户
                 </button>
             </div>
             
+            <!-- 从Redis获取用户 -->
             <div class="mb-6">
                 <h3 class="text-lg font-medium mb-3 text-gray-600">获取用户</h3>
                 <div class="flex items-center">
-                    <input type="number" id="getUserId" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="getUser()" class="ml-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
-                        <i class="fa fa-search mr-1"></i>获取用户
+                    <input type="number" id="getUserId" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户ID">
+                    <button onclick="getUser()" class="ml-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300">
+                        <i class="fas fa-search mr-1"></i>获取用户
                     </button>
                 </div>
             </div>
             
+            <!-- 从Redis删除用户 -->
             <div class="mb-6">
                 <h3 class="text-lg font-medium mb-3 text-gray-600">删除用户</h3>
                 <div class="flex items-center">
-                    <input type="number" id="deleteUserId" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="deleteUser()" class="ml-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">
-                        <i class="fa fa-trash mr-1"></i>删除用户
+                    <input type="number" id="deleteUserId" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户ID">
+                    <button onclick="deleteUser()" class="ml-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300">
+                        <i class="fas fa-trash mr-1"></i>删除用户
                     </button>
                 </div>
             </div>
         </div>
         
+        <!-- Hash结构操作区域 -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">Hash结构操作</h2>
             
+            <!-- 保存用户名到Hash -->
             <div class="mb-6">
                 <h3 class="text-lg font-medium mb-3 text-gray-600">保存用户名到Hash</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-gray-700 mb-2">用户ID</label>
-                        <input type="number" id="hashUserId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="hashUserId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户ID">
                     </div>
                     <div>
                         <label class="block text-gray-700 mb-2">用户名</label>
-                        <input type="text" id="hashUserName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="hashUserName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户名">
                     </div>
                 </div>
-                <button onclick="saveUserNameToHash()" class="mt-4 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md">
-                    <i class="fa fa-save mr-1"></i>保存到Hash
+                <button onclick="saveUserNameToHash()" class="mt-4 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition duration-300">
+                    <i class="fas fa-save mr-1"></i>保存到Hash
                 </button>
             </div>
             
+            <!-- 从Hash获取用户名 -->
             <div>
                 <h3 class="text-lg font-medium mb-3 text-gray-600">从Hash获取用户名</h3>
                 <div class="flex items-center">
-                    <input type="number" id="getHashUserId" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="getUserNameFromHash()" class="ml-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md">
-                        <i class="fa fa-search mr-1"></i>从Hash获取
+                    <input type="number" id="getHashUserId" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户ID">
+                    <button onclick="getUserNameFromHash()" class="ml-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md transition duration-300">
+                        <i class="fas fa-search mr-1"></i>从Hash获取
                     </button>
                 </div>
             </div>
         </div>
         
+        <!-- 操作结果展示区域 -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">操作结果</h2>
             <div id="result" class="p-4 border border-gray-200 rounded-md min-h-[100px] bg-gray-50 font-mono text-sm overflow-auto"></div>
@@ -103,7 +115,10 @@
         // API基础路径
         const baseUrl = 'http://localhost:8080/api/user';
         
-        // 显示结果
+        /**
+         * 显示操作结果的函数
+         * @param {Object} data - 要显示的数据
+         */
         function showResult(data) {
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = JSON.stringify(data, null, 2);
@@ -118,12 +133,21 @@
             }
         }
         
-        // 保存用户到Redis
+        /**
+         * 保存用户到Redis
+         * 通过调用后端API将用户信息保存到Redis
+         */
         function saveUser() {
             const userId = document.getElementById('userId').value;
             const username = document.getElementById('username').value;
             const age = document.getElementById('age').value;
             const email = document.getElementById('email').value;
+            
+            // 验证输入
+            if (!userId || !username || !age || !email) {
+                showResult({code: 400, message: '请填写所有字段'});
+                return;
+            }
             
             const user = {
                 id: userId ? parseInt(userId) : null,
@@ -144,7 +168,10 @@
             .catch(error => showResult({code: 500, message: '请求失败: ' + error.message}));
         }
         
-        // 从Redis获取用户
+        /**
+         * 从Redis获取用户
+         * 通过调用后端API从Redis中获取指定ID的用户信息
+         */
         function getUser() {
             const userId = document.getElementById('getUserId').value;
             
@@ -159,7 +186,10 @@
             .catch(error => showResult({code: 500, message: '请求失败: ' + error.message}));
         }
         
-        // 从Redis删除用户
+        /**
+         * 从Redis删除用户
+         * 通过调用后端API从Redis中删除指定ID的用户
+         */
         function deleteUser() {
             const userId = document.getElementById('deleteUserId').value;
             
@@ -176,7 +206,10 @@
             .catch(error => showResult({code: 500, message: '请求失败: ' + error.message}));
         }
         
-        // 保存用户名到Hash
+        /**
+         * 保存用户名到Hash
+         * 通过调用后端API将用户名保存到Redis Hash结构中
+         */
         function saveUserNameToHash() {
             const userId = document.getElementById('hashUserId').value;
             const userName = document.getElementById('hashUserName').value;
@@ -194,7 +227,10 @@
             .catch(error => showResult({code: 500, message: '请求失败: ' + error.message}));
         }
         
-        // 从Hash获取用户名
+        /**
+         * 从Hash获取用户名
+         * 通过调用后端API从Redis Hash结构中获取用户名
+         */
         function getUserNameFromHash() {
             const userId = document.getElementById('getHashUserId').value;
             

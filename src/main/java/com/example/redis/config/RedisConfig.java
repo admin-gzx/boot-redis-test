@@ -9,40 +9,38 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * Redis配置类
- * 用于配置RedisTemplate，自定义序列化方式
+ * 配置RedisTemplate以解决键值序列化问题，确保Redis中存储的数据可读性
  */
 @Configuration
 public class RedisConfig {
 
     /**
      * 配置RedisTemplate
-     * 自定义序列化方式，解决默认序列化方式导致的key乱码问题
+     * 通过自定义序列化器解决Redis中数据乱码问题
+     * @param connectionFactory Redis连接工厂，由Spring Boot自动配置提供
+     * @return 配置好的RedisTemplate实例
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        // 创建RedisTemplate对象
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        // 创建RedisTemplate实例，用于执行Redis操作
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         // 设置连接工厂
-        template.setConnectionFactory(factory);
+        template.setConnectionFactory(connectionFactory);
         
-        // 创建字符串序列化器
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        // 创建JSON序列化器
-        GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+        // 使用StringRedisSerializer来序列化和反序列化redis的key值
+        // 这样可以确保key是可读的字符串而不是乱码
+        template.setKeySerializer(new StringRedisSerializer());
+        // 使用GenericJackson2JsonRedisSerializer来序列化和反序列化redis的value值
+        // 这样可以确保value是可读的JSON格式而不是乱码
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         
-        // 设置key的序列化方式为字符串
-        template.setKeySerializer(stringRedisSerializer);
-        // 设置hash的key的序列化方式为字符串
-        template.setHashKeySerializer(stringRedisSerializer);
+        // 设置hash key和value的序列化器
+        // 用于处理Redis Hash结构的数据
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         
-        // 设置value的序列化方式为JSON
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        // 设置hash的value的序列化方式为JSON
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
-        
-        // 初始化RedisTemplate
+        // 初始化template
         template.afterPropertiesSet();
-        
         return template;
     }
 }

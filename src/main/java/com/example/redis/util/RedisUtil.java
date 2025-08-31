@@ -13,11 +13,15 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Redis工具类
- * 封装Redis的常用操作
+ * 封装Redis的常用操作，提供简便的Redis访问接口
  */
 @Component
 public class RedisUtil {
 
+    /**
+     * RedisTemplate是Spring Data Redis提供的用于执行Redis操作的核心类
+     * 通过@Resource注解注入，由Spring容器管理其生命周期
+     */
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -30,10 +34,12 @@ public class RedisUtil {
     public boolean expire(String key, long time) {
         try {
             if (time > 0) {
+                // 设置key的过期时间
                 redisTemplate.expire(key, time, TimeUnit.SECONDS);
             }
             return true;
         } catch (Exception e) {
+            // 打印异常堆栈信息，实际项目中建议使用日志框架记录
             e.printStackTrace();
             return false;
         }
@@ -45,6 +51,7 @@ public class RedisUtil {
      * @return 时间(秒) 返回0代表为永久有效
      */
     public long getExpire(String key) {
+        // 获取key的剩余过期时间，单位为秒
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 
@@ -55,8 +62,10 @@ public class RedisUtil {
      */
     public boolean hasKey(String key) {
         try {
+            // 检查key是否存在
             return redisTemplate.hasKey(key);
         } catch (Exception e) {
+            // 打印异常堆栈信息，实际项目中建议使用日志框架记录
             e.printStackTrace();
             return false;
         }
@@ -70,8 +79,10 @@ public class RedisUtil {
     public void del(String... key) {
         if (key != null && key.length > 0) {
             if (key.length == 1) {
+                // 删除单个key
                 redisTemplate.delete(key[0]);
             } else {
+                // 删除多个key
                 redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
             }
         }
@@ -85,6 +96,7 @@ public class RedisUtil {
      * @return 值
      */
     public Object get(String key) {
+        // 如果key为null则返回null，否则从Redis中获取值
         return key == null ? null : redisTemplate.opsForValue().get(key);
     }
 
@@ -96,9 +108,11 @@ public class RedisUtil {
      */
     public boolean set(String key, Object value) {
         try {
+            // 将值存入Redis，使用默认的过期时间
             redisTemplate.opsForValue().set(key, value);
             return true;
         } catch (Exception e) {
+            // 打印异常堆栈信息，实际项目中建议使用日志框架记录
             e.printStackTrace();
             return false;
         }
@@ -114,12 +128,15 @@ public class RedisUtil {
     public boolean set(String key, Object value, long time) {
         try {
             if (time > 0) {
+                // 将值存入Redis，并设置过期时间
                 redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
             } else {
+                // 如果时间小于等于0，则使用无过期时间的方式存储
                 set(key, value);
             }
             return true;
         } catch (Exception e) {
+            // 打印异常堆栈信息，实际项目中建议使用日志框架记录
             e.printStackTrace();
             return false;
         }
@@ -134,6 +151,7 @@ public class RedisUtil {
      * @return 值
      */
     public Object hget(String key, String item) {
+        // 从Redis Hash中获取指定key和field的值
         return redisTemplate.opsForHash().get(key, item);
     }
 
@@ -143,6 +161,7 @@ public class RedisUtil {
      * @return 对应的多个键值
      */
     public Map<Object, Object> hmget(String key) {
+        // 获取Redis Hash中指定key的所有field和value
         return redisTemplate.opsForHash().entries(key);
     }
 
@@ -154,9 +173,11 @@ public class RedisUtil {
      */
     public boolean hmset(String key, Map<String, Object> map) {
         try {
+            // 将Map中的所有field和value存入Redis Hash
             redisTemplate.opsForHash().putAll(key, map);
             return true;
         } catch (Exception e) {
+            // 打印异常堆栈信息，实际项目中建议使用日志框架记录
             e.printStackTrace();
             return false;
         }
@@ -171,9 +192,11 @@ public class RedisUtil {
      */
     public boolean hset(String key, String item, Object value) {
         try {
+            // 向Redis Hash中存入指定key、field和value的数据
             redisTemplate.opsForHash().put(key, item, value);
             return true;
         } catch (Exception e) {
+            // 打印异常堆栈信息，实际项目中建议使用日志框架记录
             e.printStackTrace();
             return false;
         }
@@ -185,6 +208,7 @@ public class RedisUtil {
      * @param item 项 可以使多个 不能为null
      */
     public void hdel(String key, Object... item) {
+        // 从Redis Hash中删除指定key和fields的数据
         redisTemplate.opsForHash().delete(key, item);
     }
 
